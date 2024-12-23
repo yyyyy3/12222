@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
     <title>雙人對戰遊戲</title>
@@ -78,9 +79,11 @@ const LASER_WIDTH = 30;
 const LASER_HEIGHT = 5;
 const LASER_DAMAGE = 10;
 
+let gameState = 'start'; // 新增：遊戲狀態變數
+
 function preload() {
     // 載入背景圖片
-    bgImage = loadImage('13.png');
+    bgImage = loadImage('ocean.png');
 
     // 載入角色圖片
     sprites.player1.idle.img = loadImage('5.png');
@@ -99,42 +102,46 @@ function setup() {
 }
 
 function draw() {
-    background(220);
-    
-    // 繪製地板
-    fill(100);
-    rect(0, GROUND_Y + 50, width, 150);
-    
-    // 更新和繪製角色
-    updatePlayer(player1);
-    updatePlayer(player2);
-    
-    // 確保角色在畫面內
-    keepInBounds(player1);
-    keepInBounds(player2);
-    
-    // 更新動畫
-    let currentTime = millis();
-    if (currentTime - player1.lastUpdate > ANIMATION_SPEED) {
-        updateAnimation(player1, sprites.player1);
-        player1.lastUpdate = currentTime;
+    if (gameState === 'start') {
+        drawStartScreen();
+    } else if (gameState === 'play') {
+        background('ocean.jpg');
+        
+        // 繪製地板
+        fill(100);
+        rect(0, GROUND_Y + 50, width, 150);
+        
+        // 更新和繪製角色
+        updatePlayer(player1);
+        updatePlayer(player2);
+        
+        // 確保角色在畫面內
+        keepInBounds(player1);
+        keepInBounds(player2);
+        
+        // 更新動畫
+        let currentTime = millis();
+        if (currentTime - player1.lastUpdate > ANIMATION_SPEED) {
+            updateAnimation(player1, sprites.player1);
+            player1.lastUpdate = currentTime;
+        }
+        if (currentTime - player2.lastUpdate > ANIMATION_SPEED) {
+            updateAnimation(player2, sprites.player2);
+            player2.lastUpdate = currentTime;
+        }
+        
+        // 更新和繪製雷射
+        updateLasers();
+        drawLasers();
+        
+        // 繪製角色
+        drawCharacter(player1, sprites.player1);
+        drawCharacter(player2, sprites.player2);
+        
+        checkCollisionAndDamage();
+        drawHealthBars();
+        handleMovement();
     }
-    if (currentTime - player2.lastUpdate > ANIMATION_SPEED) {
-        updateAnimation(player2, sprites.player2);
-        player2.lastUpdate = currentTime;
-    }
-    
-    // 更新和繪製雷射
-    updateLasers();
-    drawLasers();
-    
-    // 繪製角色
-    drawCharacter(player1, sprites.player1);
-    drawCharacter(player2, sprites.player2);
-    
-    checkCollisionAndDamage();
-    drawHealthBars();
-    handleMovement();
 }
 
 function keepInBounds(player) {
